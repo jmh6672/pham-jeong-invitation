@@ -14,8 +14,8 @@
   - 아버지: 농협중앙회 888 02 011055
 - 신부: 우리은행 1002-949-248218
 
-## 디자인
-- canva 참조: https://www.canva.com/design/DAHRPpIyQ8c/47uz9QlRnGIR47WpST0KqA/edit
-
 ## 언어
-- react, javascript
+- html, javascript, css
+
+## 디자인
+- 
