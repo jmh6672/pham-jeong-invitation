@@ -165,7 +165,7 @@
          href="https://www.google.com/maps/search/?api=1&query=Sheraton%20Hanoi%20Hotel%20K5%20Xuan%20Dieu%20Tay%20Ho%20Hanoi">GOOGLE MAP ↗</a>
     </div>
 
-    <details class="gift">
+    <details class="gift" id="giftSection">
       <summary data-t="gift.head"></summary>
       <div class="giftbody">
         <p class="giftnote" data-t="gift.note"></p>
@@ -546,6 +546,8 @@ function renderText(){
   const showTravel = lang !== 'vi';
   document.getElementById('travelHeading').style.display = showTravel ? '' : 'none';
   document.getElementById('travelCards').style.display = showTravel ? '' : 'none';
+
+  document.getElementById('giftSection').style.display = lang !== 'vi' ? '' : 'none';
 }
 
 function renderLists(){

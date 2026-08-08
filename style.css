@@ -132,7 +132,7 @@ p{margin:0 0 13px}
 
 /* our story */
 .stamps{max-width:190px;margin:0 auto 18px 0;margin-left:-8px}
-.storycover{max-width:380px;width:78%;margin:0 auto 40px}
+.storycover{max-width:380px;width:78%;margin:0 auto 40px;position:relative;left:-25px}
 .storyvideo{max-width:330px;width:100%;margin:0px auto 40px;display:block;mix-blend-mode:multiply}
 .slider{position:relative}
 .viewport{overflow:hidden}
