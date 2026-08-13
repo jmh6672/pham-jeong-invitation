@@ -28,7 +28,7 @@
 </head>
 <body>
 
-<audio id="bgm" src="resources/audio/bgmusic.mp3" loop preload="none"></audio>
+<audio id="bgm" preload="none"></audio>
 <button class="bgm-btn" id="bgmBtn" type="button" aria-label="Toggle background music" aria-pressed="false">
   <svg viewBox="0 0 18 18" fill="currentColor" aria-hidden="true">
     <rect class="bgm-bar" x="2" y="6" width="3" height="9" rx="1"></rect>
@@ -296,7 +296,10 @@
 
 <div id="lightbox" class="lightbox" aria-hidden="true">
   <button class="lightbox-close" id="lightboxClose" aria-label="Close">×</button>
+  <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous">‹</button>
   <img id="lightboxImg" src="" alt="">
+  <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next">›</button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
 
 <footer class="credit" data-t="footer.credit"></footer>
@@ -650,14 +653,43 @@ document.addEventListener('keydown', e=>{
 (function(){
   const box = document.getElementById('lightbox');
   const img = document.getElementById('lightboxImg');
-  function open(src){ img.src = src; box.classList.add('open'); box.setAttribute('aria-hidden','false'); }
+  const counter = document.getElementById('lightboxCounter');
+  const items = Array.from(document.querySelectorAll('.gal-item'));
+  const images = items.map(btn => btn.dataset.full);
+  let index = 0;
+
+  function show(i){
+    index = (i + images.length) % images.length;
+    img.src = images[index];
+    counter.textContent = (index + 1) + ' / ' + images.length;
+  }
+  function open(i){ show(i); box.classList.add('open'); box.setAttribute('aria-hidden','false'); }
   function close(){ box.classList.remove('open'); box.setAttribute('aria-hidden','true'); setTimeout(()=>{ img.src=''; }, 250); }
-  document.querySelectorAll('.gal-item').forEach(btn=>{
-    btn.addEventListener('click', ()=> open(btn.dataset.full));
+  function prev(){ show(index - 1); }
+  function next(){ show(index + 1); }
+
+  items.forEach((btn, i)=>{
+    btn.addEventListener('click', ()=> open(i));
   });
   document.getElementById('lightboxClose').addEventListener('click', close);
+  document.getElementById('lightboxPrev').addEventListener('click', prev);
+  document.getElementById('lightboxNext').addEventListener('click', next);
   box.addEventListener('click', e=>{ if(e.target === box) close(); });
-  document.addEventListener('keydown', e=>{ if(e.key === 'Escape') close(); });
+  document.addEventListener('keydown', e=>{
+    if(!box.classList.contains('open')) return;
+    if(e.key === 'Escape') close();
+    else if(e.key === 'ArrowLeft') prev();
+    else if(e.key === 'ArrowRight') next();
+  });
+
+  let touchX = null;
+  box.addEventListener('touchstart', e=>{ touchX = e.touches[0].clientX; }, {passive:true});
+  box.addEventListener('touchend', e=>{
+    if(touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if(Math.abs(dx) > 40){ dx < 0 ? next() : prev(); }
+    touchX = null;
+  }, {passive:true});
 })();
 
 /* copy to clipboard */
@@ -687,6 +719,27 @@ document.addEventListener('keydown', e=>{
 (function(){
   const bgm = document.getElementById('bgm');
   const btn = document.getElementById('bgmBtn');
+  const tracks = [
+    'resources/audio/Be My First.mp3',
+    'resources/audio/Bertha Tillman-Oh My Angel.mp3',
+    'resources/audio/Oh Honey.mp3'
+  ];
+  let queue = [];
+
+  function refillQueue(){
+    queue = tracks.slice();
+    for(let i = queue.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [queue[i], queue[j]] = [queue[j], queue[i]];
+    }
+  }
+
+  function playNext(){
+    if(queue.length === 0) refillQueue();
+    bgm.src = encodeURI(queue.pop());
+    bgm.play().catch(()=>{});
+  }
+
   function setPlaying(on){
     btn.classList.toggle('playing', on);
     btn.setAttribute('aria-pressed', String(on));
@@ -696,7 +749,8 @@ document.addEventListener('keydown', e=>{
   });
   bgm.addEventListener('play', ()=>setPlaying(true));
   bgm.addEventListener('pause', ()=>setPlaying(false));
-  bgm.play().catch(()=>{});
+  bgm.addEventListener('ended', playNext);
+  playNext();
 })();
 
 function renderAll(){ renderText(); renderLists(); renderFaq(); renderStory(); }
